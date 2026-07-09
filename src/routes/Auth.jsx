@@ -76,7 +76,7 @@ function Auth() {
         const email = error.customData.email;
         // The AuthCredential type that was used.
         const credential = GoogleAuthProvider.credentialFromError(error);
-        console.lot(errorCode, errorMessage, email, credential);
+        console.log(errorCode, errorMessage, email, credential);
       });
   };
   return (
