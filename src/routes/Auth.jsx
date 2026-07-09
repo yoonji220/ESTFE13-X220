@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { Box, Typography, TextField, Button, Divider } from "@mui/material";
 import { authService } from "../firebase";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 
 function Auth() {
   const [newAccount, setNewAccount] = useState(true);
@@ -37,6 +40,17 @@ function Auth() {
         });
     } else {
       //로그인
+      signInWithEmailAndPassword(auth, form.email, form.password)
+        .then(userCredential => {
+          // Signed in
+          const user = userCredential.user;
+          // ...
+        })
+        .catch(error => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          console.log(errorCode, errorMessage);
+        });
     }
   };
   return (
