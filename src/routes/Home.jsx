@@ -9,6 +9,7 @@ import {
   ListItem,
   ListItemText,
 } from "@mui/material";
+import UploadFileIcon from "@mui/icons-material/UploadFile";
 import {
   collection,
   addDoc,
@@ -21,12 +22,14 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 import { db } from "../firebase";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Comment from "../components/Comment";
 
 function Home({ userId }) {
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState([]);
+  const [attachment, setAttachment] = useState(null);
+  const fileInputRef = useRef(null);
 
   const handleChange = e => {
     setComment(e.target.value);
@@ -83,6 +86,24 @@ function Home({ userId }) {
   }, []);
   console.log(comments);
 
+  const onFileChange = e => {
+    // console.log(e.target.files[0]);
+    const file = e.target.files[0];
+    const reader = new FileReader();
+
+    reader.onload = e => {
+      setAttachment(e.target.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const onClearFile = () => {
+    setAttachment(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
   return (
     <>
       <Typography variant="h2" component="h2">
@@ -102,6 +123,48 @@ function Home({ userId }) {
           value={comment}
           onChange={handleChange}
         />
+        <Box sx={{ mt: 1, display: "flex", alignItems: "center", gap: 1 }}>
+          <Button
+            component="label"
+            sx={{ mt: 1 }}
+            type="button"
+            variant="outlined"
+            startIcon={<UploadFileIcon />}
+          >
+            이미지 선택
+            <input
+              type="file"
+              hidden
+              ref={fileInputRef}
+              accept="image/*"
+              onChange={onFileChange}
+            />
+          </Button>
+          {attachment && (
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Box
+                component="img"
+                src={attachment}
+                alt="미리보기"
+                sx={{
+                  width: 50,
+                  height: 50,
+                  objectFit: "cover",
+                  border: "1px solid #ddd",
+                  borderRadius: 3,
+                }}
+              ></Box>
+              <Button
+                type="button"
+                variant="outlined"
+                size="small"
+                onClick={onClearFile}
+              >
+                파일 첨부 취소
+              </Button>
+            </Box>
+          )}
+        </Box>
         <Button sx={{ mt: 2 }} type="submit" variant="contained">
           글쓰기
         </Button>
