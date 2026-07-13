@@ -22,6 +22,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../firebase";
 import { useState, useEffect } from "react";
+import Comment from "../components/Comment";
 
 function Home() {
   const [comment, setComment] = useState("");
@@ -105,7 +106,7 @@ function Home() {
         </Button>
       </Box>
       <Divider sx={{ my: 3 }} />
-      <List sx={{ width: "100%", bgcolor: "background.paper" }}>
+      <List sx={{ width: "100%" }}>
         {/*comments배열의 값을 ListItem으로 출력 */}
         {/* {comments.map(comment => (
           <div key={comment.id}>
@@ -119,17 +120,7 @@ function Home() {
           </div>
         ))} */}
         {comments.map(item => (
-          <ListItem key={item.id} alignItems="flex-start" divider>
-            <ListItemText
-              primary={item.comment}
-              secondary={
-                item.date?.toDate
-                  ? item.date.toDate().toLocaleString()
-                  : "작성시간 없음"
-              }
-            />
-          </ListItem>
-          //     <Divider variant="inset" component="li" />
+          <Comment key={item.id} item={item} />
         ))}
       </List>
     </>
