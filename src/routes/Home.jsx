@@ -1,10 +1,28 @@
-import { Box, Typography, TextField, Button, Divider } from "@mui/material";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import {
+  Box,
+  Typography,
+  TextField,
+  Button,
+  Divider,
+  useScrollTrigger,
+  List,
+  ListItem,
+  ListItemText,
+} from "@mui/material";
+import {
+  collection,
+  addDoc,
+  serverTimestamp,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
 import { db } from "../firebase";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function Home() {
   const [comment, setComment] = useState("");
+  const [comments, setComments] = useState([]);
 
   const handleChange = e => {
     setComment(e.target.value);
@@ -23,6 +41,41 @@ function Home() {
       console.error("글 추가시 에러가 발생했습니다.", e);
     }
   };
+
+  // useEffect(() => {
+  //   const getComments = async () => {
+  //     const q = query(collection(db, "comments"));
+  //     const querySnapshot = await getDocs(q);
+  //     const commentList = [];
+
+  //     querySnapshot.forEach(doc => {
+  //       commentList.push({
+  //         id: doc.id,
+  //         ...doc.data(),
+  //       });
+  //     });
+  //     setComments(commentList);
+  //   };
+  // });
+  const getComments = async () => {
+    const q = query(collection(db, "comments"));
+    // querySnapshot.forEach(doc => {
+    //   // doc.data() is never undefined for query doc snapshots
+    //   console.log(doc.id, " => ", doc.data());
+    // });
+    const querySnapshot = await getDocs(q);
+    console.log(querySnapshot);
+    const commentsArray = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    setComments(commentsArray);
+  };
+  useEffect(() => {
+    getComments();
+  }, []);
+  console.log(comments);
 
   return (
     <>
@@ -48,6 +101,29 @@ function Home() {
         </Button>
       </Box>
       <Divider sx={{ my: 3 }} />
+      <List sx={{ width: "100%", bgcolor: "background.paper" }}>
+        {/*comments배열의 값을 ListItem으로 출력 */}
+        {/* {comments.map(comment => (
+          <div key={comment.id}>
+            <ListItem alignItems="flex-start">
+              <ListItemText
+                primary={comment.comment}
+                secondary={comment.date?.toDate().toLocaleString()}
+              />
+            </ListItem>
+            <Divider variant="inset" component="li" />
+          </div>
+        ))} */}
+        {comments.map(item => (
+          <ListItem key={item.id} alignItems="flex-start" divider>
+            <ListItemText
+              primary={item.comment}
+              secondary={item.date.toDate().toLocaleString()}
+            />
+          </ListItem>
+          //     <Divider variant="inset" component="li" />
+        ))}
+      </List>
     </>
   );
 }
