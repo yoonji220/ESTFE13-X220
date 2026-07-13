@@ -16,6 +16,9 @@ import {
   query,
   where,
   getDocs,
+  orderBy,
+  limit,
+  onSnapshot,
 } from "firebase/firestore";
 import { db } from "../firebase";
 import { useState, useEffect } from "react";
@@ -37,6 +40,7 @@ function Home() {
         date: serverTimestamp(),
       });
       setComment("");
+      // getComments();
     } catch (e) {
       console.error("글 추가시 에러가 발생했습니다.", e);
     }
@@ -58,20 +62,20 @@ function Home() {
   //   };
   // });
   const getComments = async () => {
-    const q = query(collection(db, "comments"));
-    // querySnapshot.forEach(doc => {
-    //   // doc.data() is never undefined for query doc snapshots
-    //   console.log(doc.id, " => ", doc.data());
-    // });
-    const querySnapshot = await getDocs(q);
-    console.log(querySnapshot);
-    const commentsArray = querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-
-    setComments(commentsArray);
+    const q = query(
+      collection(db, "comments"),
+      orderBy("date", "desc"),
+      limit(5),
+    );
+    onSnapshot(q, querySnapshot => {
+      const commentsArray = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setComments(commentsArray);
+    });
   };
+
   useEffect(() => {
     getComments();
   }, []);
@@ -118,7 +122,11 @@ function Home() {
           <ListItem key={item.id} alignItems="flex-start" divider>
             <ListItemText
               primary={item.comment}
-              secondary={item.date.toDate().toLocaleString()}
+              secondary={
+                item.date?.toDate
+                  ? item.date.toDate().toLocaleString()
+                  : "작성시간 없음"
+              }
             />
           </ListItem>
           //     <Divider variant="inset" component="li" />
