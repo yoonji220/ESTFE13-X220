@@ -96,7 +96,14 @@ function Comment({ item, isShown }) {
           />
           {/* // 이미지가 있으면 이미지 출력 */}
           {item.image && (
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Box
+              sx={{
+                marginRight: "5px",
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+              }}
+            >
               <Box
                 component="img"
                 src={item.image}
