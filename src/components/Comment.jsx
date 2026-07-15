@@ -7,8 +7,9 @@ import {
   Box,
   TextField,
 } from "@mui/material";
-import { db } from "../firebase";
+import { db, storageService } from "../firebase";
 import { doc, deleteDoc, updateDoc } from "firebase/firestore";
+import { ref, deleteObject } from "firebase/storage";
 import { useState } from "react";
 
 function Comment({ item, isShown }) {
@@ -24,16 +25,18 @@ function Comment({ item, isShown }) {
   //   console.error(error);
   // }
   const handleDelete = async () => {
-    // if (window.confirm("정말 삭제할까요?")) {
-    //   // or if (!window.confirm('정말 삭제할까요?')) return;
-    //   await deleteDoc(doc(db, "comments", item.id));
-    // }
+    if (!window.confirm("정말 삭제할까요?")) return;
     try {
       await deleteDoc(doc(db, "comments", item.id));
-      console.log("삭제 성공:", item.id);
+
+      if (item.image) {
+        const storage = storageService;
+        const storageRef = ref(storage, item.image);
+        await deleteObject(storageRef);
+      }
     } catch (error) {
-      console.error("삭제 실패:", error);
-      alert("삭제에 실패했습니다.");
+      console.error("삭제오류", error);
+      alert("삭제중 오류가 발생했습니다.");
     }
   };
 
@@ -90,20 +93,42 @@ function Comment({ item, isShown }) {
                 : "작성시간 없음"
             }
           />
-          {isShown && (
-            <Stack direction="row" spacing={1}>
-              <Button variant="outlined" size="small" onClick={toggleEditMode}>
-                수정
-              </Button>
-              <Button
-                variant="contained"
-                color="error"
-                size="small"
-                onClick={handleDelete}
-              >
-                삭제
-              </Button>
-            </Stack>
+          {/* // 이미지가 있으면 이미지 출력 */}
+          {item.image && (
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Box
+                component="img"
+                src={item.image}
+                alt="첨부 이미지"
+                sx={{
+                  width: 50,
+                  height: 50,
+                  objectFit: "cover",
+                  border: "1px solid #ddd",
+                  borderRadius: 3,
+                }}
+              />
+
+              {isShown && (
+                <Stack direction="row" spacing={1}>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={toggleEditMode}
+                  >
+                    수정
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="error"
+                    size="small"
+                    onClick={handleDelete}
+                  >
+                    삭제
+                  </Button>
+                </Stack>
+              )}
+            </Box>
           )}
         </>
       )}
