@@ -33,10 +33,11 @@ function Comment({ item, isShown }) {
         const storage = storageService;
         const storageRef = ref(storage, item.image);
         await deleteObject(storageRef);
+        // await deleteObject(item.image);
       }
     } catch (error) {
       console.error("삭제오류", error);
-      alert("삭제중 오류가 발생했습니다.");
+      alert("삭제 중 오류가 발생했습니다.");
     }
   };
 
