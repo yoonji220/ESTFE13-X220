@@ -21,8 +21,10 @@ import {
   limit,
   onSnapshot,
 } from "firebase/firestore";
-import { db } from "../firebase";
+import { db, storageService } from "../firebase";
+import { ref } from "firebase/storage";
 import { useState, useEffect, useRef } from "react";
+import { v4 as uuidv4 } from "uuid";
 import Comment from "../components/Comment";
 
 function Home({ userId }) {
@@ -31,12 +33,16 @@ function Home({ userId }) {
   const [attachment, setAttachment] = useState(null);
   const fileInputRef = useRef(null);
 
+  const storage = storageService; // 필수가 아님! 메뉴얼대로 하는중..! 이름 아바꿨으면 이런단계가 필요가 없다..? 스토리지 초기화 부분
+  const storageRef = ref(storage); // 참조 초기화
+
   const handleChange = e => {
     setComment(e.target.value);
   };
 
   const onSubmit = async e => {
     e.preventDefault();
+    const storageRef = ref(storage, `${userId}/${uuidv4()}`);
     try {
       const docRef = await addDoc(collection(db, "comments"), {
         // comment: comment,
