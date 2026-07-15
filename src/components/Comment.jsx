@@ -109,27 +109,23 @@ function Comment({ item, isShown }) {
                   borderRadius: 3,
                 }}
               />
-
-              {isShown && (
-                <Stack direction="row" spacing={1}>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={toggleEditMode}
-                  >
-                    수정
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="error"
-                    size="small"
-                    onClick={handleDelete}
-                  >
-                    삭제
-                  </Button>
-                </Stack>
-              )}
             </Box>
+          )}
+
+          {isShown && (
+            <Stack direction="row" spacing={1}>
+              <Button variant="outlined" size="small" onClick={toggleEditMode}>
+                수정
+              </Button>
+              <Button
+                variant="contained"
+                color="error"
+                size="small"
+                onClick={handleDelete}
+              >
+                삭제
+              </Button>
+            </Stack>
           )}
         </>
       )}

@@ -15,9 +15,10 @@ import Comment from "../components/Comment";
 
 function Profile() {
   const auth = authService;
+  const userId = auth.currentUser.uid;
+
   const navigate = useNavigate();
   const [comments, setComments] = useState([]);
-  const userId = auth.currentUser.uid;
 
   const getComments = async () => {
     const q = query(
@@ -61,11 +62,10 @@ function Profile() {
       >
         로그아웃
       </Button>
-
       <Divider sx={{ my: 3 }} />
       <List sx={{ width: "100%" }}>
         {comments.map(item => (
-          <Comment key={item.id} item={item} isShown={userId === item.uid} />
+          <Comment key={item.id} item={item} isShown={true} />
         ))}
       </List>
     </>
