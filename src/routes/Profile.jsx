@@ -1,11 +1,44 @@
 import { signOut } from "firebase/auth";
-import { authService } from "../firebase";
-import { Typography, Button } from "@mui/material";
+import { authService, db } from "../firebase";
+import { Typography, Button, Divider, List } from "@mui/material";
 import { useNavigate } from "react-router";
+import { useEffect, useState } from "react";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  orderBy,
+  onSnapshot,
+} from "firebase/firestore";
+import Comment from "../components/Comment";
 
 function Profile() {
   const auth = authService;
   const navigate = useNavigate();
+  const [comments, setComments] = useState([]);
+  const userId = auth.currentUser.uid;
+
+  const getComments = async () => {
+    const q = query(
+      collection(db, "comments"),
+      where("uid", "==", userId),
+      orderBy("date", "desc"),
+    );
+
+    onSnapshot(q, querySnapshot => {
+      const commentsArray = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setComments(commentsArray);
+    });
+  };
+
+  useEffect(() => {
+    getComments();
+  }, []);
 
   const onLogout = () => {
     signOut(auth)
@@ -16,6 +49,7 @@ function Profile() {
         // An error happened.
       });
   };
+  console.log(comments);
   return (
     <>
       <h2>Profile</h2>
@@ -27,6 +61,13 @@ function Profile() {
       >
         로그아웃
       </Button>
+
+      <Divider sx={{ my: 3 }} />
+      <List sx={{ width: "100%" }}>
+        {comments.map(item => (
+          <Comment key={item.id} item={item} isShown={userId === item.uid} />
+        ))}
+      </List>
     </>
   );
 }
